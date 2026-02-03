@@ -44,7 +44,6 @@ jobs:
           path: ${{ steps.find.outputs.vsix }}
 
   publish-marketplace:
-    if: ${{ secrets.AZURE_DEVOPS_EXT_PAT != '' && secrets.VSIX_PUBLISHER != '' }}
     runs-on: ubuntu-latest
     needs: release
     steps:
@@ -60,6 +59,7 @@ jobs:
           echo "VSIX=$VSIX" >> $GITHUB_ENV
 
       - name: Publish to Visual Studio Marketplace
+        if: ${{ secrets.AZURE_DEVOPS_EXT_PAT != '' && secrets.VSIX_PUBLISHER != '' }}
         run: |
           echo "Publishing $VSIX to Visual Studio Marketplace..."
           tfx extension publish --vsix "$VSIX" --token "${{ secrets.AZURE_DEVOPS_EXT_PAT }}" --publisher "${{ secrets.VSIX_PUBLISHER }}"
