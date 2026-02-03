@@ -16,7 +16,9 @@ jobs:
         run: |
           VSIX=$(find . -type f -name '*.vsix' | head -n1)
           if [ -z "$VSIX" ]; then echo "No VSIX found." && exit 1; fi
+          BASENAME=$(basename "$VSIX")
           echo "vsix=$VSIX" >> $GITHUB_OUTPUT
+          echo "vsix_name=$BASENAME" >> $GITHUB_OUTPUT
 
       - name: Create GitHub Release
         id: create_release
@@ -34,7 +36,7 @@ jobs:
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
           asset_path: ${{ steps.find.outputs.vsix }}
-          asset_name: ${{ steps.find.outputs.vsix }}
+          asset_name: ${{ steps.find.outputs.vsix_name }}
           asset_content_type: application/octet-stream
 
       - name: Upload artifact
