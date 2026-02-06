@@ -121,7 +121,9 @@ test('Web Table Handling', async ({page})=>
     }
     for (let i = 0; i < tableRows; i++)
     {
-       const courseName = await page.locator("table[name='courses'] tbody tr").nth(i).locator("td").nth(0).textContent();
+      const firstCell = page.locator("table[name='courses'] tbody tr").nth(i).locator("td").nth(0);
+      await firstCell.waitFor({ timeout: 10000 });
+      const courseName = await firstCell.textContent();
        if(courseName.includes("Python"))
        {
           const coursePrice = await page.locator("table[name='courses'] tbody tr").nth(i).locator("td").nth(2).textContent();
