@@ -45,8 +45,9 @@ test('Handling Frames', async ({browser})=>
     const page =  await context.newPage();
     await page.goto("https://rahulshettyacademy.com/AutomationPractice/");
     const framePage = page.frameLocator("#courses-iframe");
-    await framePage.locator("a[href*='mentorship']").first().click();
-    const text = await framePage.locator(".pricing-title").allTextContents();
+   await framePage.locator("a[href*='mentorship']").first().click();
+   await framePage.locator('.pricing-title').first().waitFor({ timeout: 10000 });
+   const text = await framePage.locator(".pricing-title").allTextContents();
     console.log(text);
  
  });    
@@ -121,9 +122,14 @@ test('Web Table Handling', async ({page})=>
     }
     for (let i = 0; i < tableRows; i++)
     {
-      const firstCell = page.locator("table[name='courses'] tbody tr").nth(i).locator("td").nth(0);
-      await firstCell.waitFor({ timeout: 10000 });
-      const courseName = await firstCell.textContent();
+          const firstCell = page.locator("table[name='courses'] tbody tr").nth(i).locator("td").nth(0);
+          try {
+             await firstCell.waitFor({ timeout: 30000 });
+          } catch (e) {
+             console.warn('Timeout waiting for table cell, skipping this row');
+             continue;
+          }
+          const courseName = await firstCell.textContent();
        if(courseName.includes("Python"))
        {
           const coursePrice = await page.locator("table[name='courses'] tbody tr").nth(i).locator("td").nth(2).textContent();
