@@ -6,6 +6,7 @@
   "scripts": {
     "test": "npx playwright test",
     "test:examples": "npx playwright test tests/playwright-examples --workers=1"
+    ,"test:pom": "npx playwright test tests/pom --workers=1"
   },
   "keywords": [],
   "author": "",
