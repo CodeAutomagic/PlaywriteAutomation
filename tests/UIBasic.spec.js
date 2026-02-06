@@ -116,20 +116,19 @@ test('Web Table Handling', async ({page})=>
     // wait for the courses table to appear
     await page.waitForSelector("table[name='courses'] tbody tr", { timeout: 15000 });
     const tableRows = await page.locator("table[name='courses'] tbody tr").count();     
-    if (tableRows === 0) {
-       console.warn('No course rows found; skipping table assertions');
-       return;
-    }
-    for (let i = 0; i < tableRows; i++)
-    {
-          const firstCell = page.locator("table[name='courses'] tbody tr").nth(i).locator("td").nth(0);
-          try {
-             await firstCell.waitFor({ timeout: 30000 });
-          } catch (e) {
-             console.warn('Timeout waiting for table cell, skipping this row');
-             continue;
-          }
-          const courseName = await firstCell.textContent();
+      if (tableRows === 0) {
+          console.warn('No course rows found; skipping table assertions');
+          return;
+      }
+
+      // Wait briefly for at least one table cell to contain text (table may be populated asynchronously)
+      await page.waitForFunction(() => {
+         const cells = Array.from(document.querySelectorAll("table[name='courses'] tbody tr td:first-child"));
+         return cells.length > 0 && cells.some(c => c && c.textContent && c.textContent.trim().length > 0);
+      }, { timeout: 10000 });
+
+      for (let i = 0; i < tableRows; i++) {
+         const courseName = await page.locator("table[name='courses'] tbody tr").nth(i).locator("td").nth(0).textContent();
        if(courseName.includes("Python"))
        {
           const coursePrice = await page.locator("table[name='courses'] tbody tr").nth(i).locator("td").nth(2).textContent();
