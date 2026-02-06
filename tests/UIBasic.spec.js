@@ -127,15 +127,19 @@ test('Web Table Handling', async ({page})=>
          return cells.length > 0 && cells.some(c => c && c.textContent && c.textContent.trim().length > 0);
       }, { timeout: 10000 });
 
-      for (let i = 0; i < tableRows; i++) {
-         const courseName = await page.locator("table[name='courses'] tbody tr").nth(i).locator("td").nth(0).textContent();
-       if(courseName.includes("Python"))
-       {
-          const coursePrice = await page.locator("table[name='courses'] tbody tr").nth(i).locator("td").nth(2).textContent();
-          console.log("Course Name: "+courseName+" Price: "+coursePrice); 
+      // Read table content directly in page context to avoid flaky locator timing
+      const rowsData = await page.evaluate(() => {
+         const rows = Array.from(document.querySelectorAll("table[name='courses'] tbody tr"));
+         return rows.map(r => Array.from(r.querySelectorAll('td')).map(td => (td && td.textContent) ? td.textContent.trim() : ''));
+      });
 
-       }  
-    }
+      for (let i = 0; i < rowsData.length; i++) {
+         const courseName = rowsData[i][0] || '';
+         if (courseName.includes('Python')) {
+            const coursePrice = rowsData[i][2] || '';
+            console.log('Course Name: ' + courseName + ' Price: ' + coursePrice);
+         }
+      }
   }    );
 
 test('Handling Checkboxes', async ({page})=>
